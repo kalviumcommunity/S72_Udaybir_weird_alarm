@@ -52,4 +52,3 @@ This web application is designed to collect and showcase the most unusual and fu
 ## Why This Project
 
 
-
