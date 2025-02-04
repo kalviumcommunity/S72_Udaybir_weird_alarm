@@ -1,6 +1,14 @@
 const express = require('express');
+const { MongoClient } = require('mongodb');
+require('dotenv').config();
 const app = express();
 const port = 3000;
+
+// MongoDB client setup
+const client = new MongoClient(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
 // Basic /ping route with error handling
 app.get('/ping', (req, res, next) => {
@@ -8,6 +16,22 @@ app.get('/ping', (req, res, next) => {
     res.send('Pong');
   } catch (error) {
     next(error); // Pass the error to the error-handling middleware
+  }
+});
+
+// MongoDB connection status route
+app.get('/', async (req, res, next) => {
+  try {
+    // Try connecting to MongoDB
+    await client.connect();
+    const database = client.db('your-database-name');
+    const status = await database.command({ ping: 1 });
+    res.json({
+      message: 'Connected to MongoDB',
+      status: status,
+    });
+  } catch (error) {
+    next(error); // Pass any error to the error-handling middleware
   }
 });
 
@@ -31,4 +55,4 @@ app.use((req, res) => {
 // Start the server
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
-}); 
+});
