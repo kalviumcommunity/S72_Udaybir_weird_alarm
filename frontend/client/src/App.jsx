@@ -1,19 +1,28 @@
 // src/App.jsx
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import AlarmCard from './components/AlarmCard';
 
+
 const App = () => {
-  const alarms = [
-    { title: 'Morning Alarm', time: '07:00 AM', sound: 'Beep Beep' },
-    { title: 'Lunch Reminder', time: '12:30 PM', sound: 'Ding Ding' },
-    { title: 'Bedtime Alarm', time: '10:00 PM', sound: 'Chime' }
-  ];
+
+  const [alarms, setAlarms] = useState([]);
+
+  useEffect(() => {
+    const fetchAlarms = async () => {
+      const response = await fetch('http://localhost:3000/alarms');
+      const data = await response.json();
+      setAlarms(data);
+    };
+
+    fetchAlarms();
+  }, []);
+
 
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-4">Weird Alarms</h1>
-      {alarms.map((alarm, index) => (
-        <AlarmCard key={index} {...alarm} />
+      {alarms.map((alarm) => (
+        <AlarmCard key={alarm._id} {...alarm} />
       ))}
     </div>
   );
