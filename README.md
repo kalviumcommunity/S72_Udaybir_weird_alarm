@@ -47,7 +47,6 @@ This web application is designed to collect and showcase the most unusual and fu
 - **GitHub**: For version control and collaboration.
 - **Netlify**: For deployment.
 
-
 Frontend: [Live Site](https://weird-alarm.pages.dev)  
 Backend: [API Endpoint](https://weird-alarm.workers.dev)
 
@@ -58,5 +57,3 @@ Backend: [API Endpoint](https://weird-alarm.workers.dev)
 I chose this project because it’s a fun and interactive way to explore web development concepts while tapping into a topic that people can relate to. The concept of alarm sounds adds humor and uniqueness to the project, and it's highly customizable based on user interaction. This project will help me develop key full-stack development skills, such as handling dynamic user input, categorizing data, and building a personalized user experience. Additionally, it presents a creative challenge in implementing sound files and managing ratings in a database. I’m excited to combine something silly with a technical challenge, creating an app that can bring a smile to people's faces while pushing my skills as a developer...!!
 
 deploy link: https://s72-udaybir-weird-alarm-1.onrender.com/
-
-added the connection link for the deployed app.
