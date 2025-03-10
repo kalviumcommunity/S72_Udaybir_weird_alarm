@@ -47,6 +47,9 @@ This web application is designed to collect and showcase the most unusual and fu
 - **GitHub**: For version control and collaboration.
 - **Netlify**: For deployment.
 
+Frontend: [Live Site](https://weird-alarm.pages.dev)  
+Backend: [API Endpoint](https://weird-alarm.workers.dev)
+
 ---
 
 ## Why This Project
