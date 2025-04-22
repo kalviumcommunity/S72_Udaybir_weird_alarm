@@ -1,21 +1,29 @@
+// Import necessary modules
 const express = require('express');
 const cors = require('cors');
-const { MongoClient } = require('mongodb');
 require('dotenv').config();
+
 const app = express();
 const port = 3000;
 
-// Enable CORS for all routes
+// Import MongoDB routes
+const mongoRoutes = require('./backend/routes/routes');
+
+// Import MySQL routes
+const mysqlRoutes = require('./S72_Udaybir_weird_alarm/backend/routes/mysqlRoutes');
+
 app.use(cors({
   origin: 'http://localhost:5173', // Vite default port
   methods: ['GET', 'POST', 'PUT', 'DELETE']
 }));
 
-// Parse JSON bodies
 app.use(express.json());
 
-// Database setup
-const { connectDB } = require('./backend/db');
+// Use MongoDB routes
+app.use('/api', mongoRoutes);
+
+// Use MySQL routes
+app.use('/mysql-api', mysqlRoutes);
 
 // Basic /ping route with error handling
 app.get('/ping', (req, res, next) => {
@@ -23,22 +31,6 @@ app.get('/ping', (req, res, next) => {
     res.send('Pong');
   } catch (error) {
     next(error); // Pass the error to the error-handling middleware
-  }
-});
-
-// MongoDB connection status route
-app.get('/', async (req, res, next) => {
-  try {
-    // Try connecting to MongoDB
-    await client.connect();
-    const database = client.db('your-database-name');
-    const status = await database.command({ ping: 1 });
-    res.json({
-      message: 'Connected to MongoDB',
-      status: status,
-    });
-  } catch (error) {
-    next(error); // Pass any error to the error-handling middleware
   }
 });
 
@@ -59,17 +51,7 @@ app.use((req, res) => {
   });
 });
 
-// Start the server after DB connection
-async function startServer() {
-  try {
-    await connectDB();
-    app.listen(port, () => {
-      console.log(`Server running at http://localhost:${port}`);
-    });
-  } catch (err) {
-    console.error('Failed to start server:', err);
-    process.exit(1);
-  }
-}
-
-startServer();
+// Start the server
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`);
+});
