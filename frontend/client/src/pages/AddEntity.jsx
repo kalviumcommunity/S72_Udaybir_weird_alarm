@@ -1,8 +1,28 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
-const AddEntity = ({ onEntityAdded }) => {
+const AddEntity = () => {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
+    const [entities, setEntities] = useState([]);
+
+    const fetchEntities = async () => {
+        try {
+            const response = await fetch('http://localhost:8000/alarms');
+            if (response.ok) {
+                const data = await response.json();
+                setEntities(data);
+            } else {
+                console.error('Failed to fetch entities');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchEntities();
+    }, []);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -10,7 +30,7 @@ const AddEntity = ({ onEntityAdded }) => {
         const newEntity = { name, description };
 
         try {
-            const response = await fetch('http://localhost:8000/entities', {
+            const response = await fetch('http://localhost:8000/alarms', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(newEntity),
@@ -18,7 +38,7 @@ const AddEntity = ({ onEntityAdded }) => {
 
             if (response.ok) {
                 const addedEntity = await response.json();
-                onEntityAdded(addedEntity);  // Update UI with new entity
+                setEntities([...entities, addedEntity]);
                 setName('');
                 setDescription('');
             } else {
@@ -30,9 +50,9 @@ const AddEntity = ({ onEntityAdded }) => {
     };
 
     return (
-        <div className="p-4 border rounded shadow-lg max-w-md mx-auto">
+        <div className="p-4 max-w-2xl mx-auto">
             <h2 className="text-xl font-bold mb-4">Add New Entity</h2>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} className="mb-6">
                 <input
                     type="text"
                     value={name}
@@ -55,6 +75,24 @@ const AddEntity = ({ onEntityAdded }) => {
                     Add Entity
                 </button>
             </form>
+
+            <h3 className="text-lg font-semibold mb-2">Entities List</h3>
+            <ul>
+                {entities.map((entity) => (
+                    <li key={entity._id} className="mb-2 border p-2 rounded flex justify-between items-center">
+                        <div>
+                            <strong>{entity.name}</strong>
+                            <p>{entity.description}</p>
+                        </div>
+                        <Link
+                            to={`/update/${entity._id}`}
+                            className="text-blue-600 hover:underline"
+                        >
+                            Edit
+                        </Link>
+                    </li>
+                ))}
+            </ul>
         </div>
     );
 };

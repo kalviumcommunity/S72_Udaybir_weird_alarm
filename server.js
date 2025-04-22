@@ -1,14 +1,21 @@
 const express = require('express');
+const cors = require('cors');
 const { MongoClient } = require('mongodb');
 require('dotenv').config();
 const app = express();
 const port = 3000;
 
-// MongoDB client setup
-const client = new MongoClient(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+// Enable CORS for all routes
+app.use(cors({
+  origin: 'http://localhost:5173', // Vite default port
+  methods: ['GET', 'POST', 'PUT', 'DELETE']
+}));
+
+// Parse JSON bodies
+app.use(express.json());
+
+// Database setup
+const { connectDB } = require('./backend/db');
 
 // Basic /ping route with error handling
 app.get('/ping', (req, res, next) => {
@@ -52,7 +59,17 @@ app.use((req, res) => {
   });
 });
 
-// Start the server
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
-});
+// Start the server after DB connection
+async function startServer() {
+  try {
+    await connectDB();
+    app.listen(port, () => {
+      console.log(`Server running at http://localhost:${port}`);
+    });
+  } catch (err) {
+    console.error('Failed to start server:', err);
+    process.exit(1);
+  }
+}
+
+startServer();
