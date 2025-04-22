@@ -5,10 +5,30 @@ const AddEntity = () => {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [entities, setEntities] = useState([]);
+    const [users, setUsers] = useState([]);
+    const [selectedUser, setSelectedUser] = useState('');
 
-    const fetchEntities = async () => {
+    const fetchUsers = async () => {
         try {
-            const response = await fetch('http://localhost:8000/alarms');
+            const response = await fetch('http://localhost:8000/users');
+            if (response.ok) {
+                const data = await response.json();
+                setUsers(data);
+            } else {
+                console.error('Failed to fetch users');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    };
+
+    const fetchEntities = async (userId = '') => {
+        try {
+            let url = 'http://localhost:8000/alarms';
+            if (userId) {
+                url += `?created_by=${userId}`;
+            }
+            const response = await fetch(url);
             if (response.ok) {
                 const data = await response.json();
                 setEntities(data);
@@ -21,13 +41,25 @@ const AddEntity = () => {
     };
 
     useEffect(() => {
+        fetchUsers();
         fetchEntities();
     }, []);
+
+    const handleUserChange = (e) => {
+        const userId = e.target.value;
+        setSelectedUser(userId);
+        fetchEntities(userId);
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const newEntity = { name, description };
+        if (!selectedUser) {
+            alert('Please select a user');
+            return;
+        }
+
+        const newEntity = { name, description, created_by: selectedUser };
 
         try {
             const response = await fetch('http://localhost:8000/alarms', {
@@ -53,6 +85,19 @@ const AddEntity = () => {
         <div className="p-4 max-w-2xl mx-auto">
             <h2 className="text-xl font-bold mb-4">Add New Entity</h2>
             <form onSubmit={handleSubmit} className="mb-6">
+                <select
+                    value={selectedUser}
+                    onChange={handleUserChange}
+                    required
+                    className="w-full p-2 mb-3 border rounded"
+                >
+                    <option value="">Select User</option>
+                    {users.map((user) => (
+                        <option key={user._id} value={user._id}>
+                            {user.name || user.username || user.email || user._id}
+                        </option>
+                    ))}
+                </select>
                 <input
                     type="text"
                     value={name}
