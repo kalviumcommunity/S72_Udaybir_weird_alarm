@@ -1,16 +1,17 @@
 // Import necessary modules
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser'); // Added cookie-parser
 require('dotenv').config();
 
 const app = express();
 const port = 3000;
 
 // Import MongoDB routes
-const mongoRoutes = require('./backend/routes/routes');
+const mongoRoutes = require('../routes/routes');
 
 // Import MySQL routes
-const mysqlRoutes = require('./S72_Udaybir_weird_alarm/backend/routes/mysqlRoutes');
+const mysqlRoutes = require('../routes/mysqlRoutes');
 
 app.use(cors({
   origin: 'http://localhost:5173', // Vite default port
@@ -18,6 +19,7 @@ app.use(cors({
 }));
 
 app.use(express.json());
+app.use(cookieParser()); // Use cookie-parser middleware
 
 // Use MongoDB routes
 app.use('/api', mongoRoutes);
