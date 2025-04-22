@@ -10,7 +10,9 @@ const {
 } = require("../controllers/alarmController");
 
 const {
-    getUsers
+    getUsers,
+    login,
+    logout
 } = require("../controllers/userController");
 
 // Alarm routes
@@ -22,5 +24,7 @@ router.delete("/alarms/:id", deleteAlarm);
 
 // User routes
 router.get("/users", getUsers);
+router.post("/login", login);
+router.post("/logout", logout);
 
 module.exports = router;

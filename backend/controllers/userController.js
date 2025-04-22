@@ -74,10 +74,28 @@ const deleteUser = async (req, res) => {
     }
 };
 
+// Login user and set username cookie
+const login = (req, res) => {
+    const { username } = req.body;
+    if (!username) {
+        return res.status(400).json({ message: 'Username is required' });
+    }
+    res.cookie('username', username, { httpOnly: true });
+    res.json({ message: 'Login successful' });
+};
+
+// Logout user and clear username cookie
+const logout = (req, res) => {
+    res.clearCookie('username');
+    res.json({ message: 'Logout successful' });
+};
+
 module.exports = {
     getUsers,
     getUserById,
     createUser,
     updateUser,
-    deleteUser
+    deleteUser,
+    login,
+    logout
 };
