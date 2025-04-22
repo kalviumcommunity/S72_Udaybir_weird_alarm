@@ -30,6 +30,11 @@ const { createAlarm: createAlarmInModel } = require("../models/alarmModel");
 // Create new alarm
 const createAlarm = async (req, res) => {
     try {
+        // Basic validation for required fields
+        const { name, time } = req.body;
+        if (!name || !time) {
+            return res.status(400).json({ error: "Missing required fields: name and time are required." });
+        }
         const newAlarm = await createAlarmInModel(req.body);
         res.status(201).json(newAlarm);
     } catch (error) {
