@@ -1,12 +1,26 @@
 const express = require("express");
 const router = express.Router();
-const { getAlarms, getAlarmById, createAlarm, updateAlarm, deleteAlarm } = require("../controllers/alarmController");
 
-// CRUD routes
-router.get("/alarms", getAlarms);          // Get all alarms
-router.get("/alarms/:id", getAlarmById);   // Get alarm by ID
-router.post("/alarms", createAlarm);       // Create new alarm
-router.put("/alarms/:id", updateAlarm);    // Update alarm
-router.delete("/alarms/:id", deleteAlarm); // Delete alarm
+const {
+    getAlarms,
+    getAlarmById,
+    createAlarm,
+    updateAlarm,
+    deleteAlarm
+} = require("../controllers/alarmController");
+
+const {
+    getUsers
+} = require("../controllers/userController");
+
+// Alarm routes
+router.get("/alarms", getAlarms);
+router.get("/alarms/:id", getAlarmById);
+router.post("/alarms", createAlarm);
+router.put("/alarms/:id", updateAlarm);
+router.delete("/alarms/:id", deleteAlarm);
+
+// User routes
+router.get("/users", getUsers);
 
 module.exports = router;

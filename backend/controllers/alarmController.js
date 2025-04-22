@@ -1,16 +1,18 @@
-const { getAlarms: getAlarmsFromModel } = require("../models/alarmModel");
+const { getAlarms: getAlarmsFromModel, createAlarm: createAlarmInModel, getAlarmById: getAlarmByIdFromModel, updateAlarm: updateAlarmInModel, deleteAlarm: deleteAlarmInModel } = require("../models/alarmModel");
 
-// Get all alarms
+// Get all alarms with optional filtering by created_by
 const getAlarms = async (req, res) => {
     try {
-        const alarms = await getAlarmsFromModel();
+        const filter = {};
+        if (req.query.created_by) {
+            filter.created_by = req.query.created_by;
+        }
+        const alarms = await getAlarmsFromModel(filter);
         res.status(200).json(alarms);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
-
-const { getAlarmById: getAlarmByIdFromModel } = require("../models/alarmModel");
 
 // Get alarm by ID
 const getAlarmById = async (req, res) => {
@@ -25,15 +27,12 @@ const getAlarmById = async (req, res) => {
     }
 };
 
-const { createAlarm: createAlarmInModel } = require("../models/alarmModel");
-
-// Create new alarm
+// Create new alarm, including created_by
 const createAlarm = async (req, res) => {
     try {
-        // Basic validation for required fields
-        const { name, time } = req.body;
-        if (!name || !time) {
-            return res.status(400).json({ error: "Missing required fields: name and time are required." });
+        const { name, time, created_by } = req.body;
+        if (!name || !time || !created_by) {
+            return res.status(400).json({ error: "Missing required fields: name, time, and created_by are required." });
         }
         const newAlarm = await createAlarmInModel(req.body);
         res.status(201).json(newAlarm);
@@ -41,8 +40,6 @@ const createAlarm = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
-
-const { updateAlarm: updateAlarmInModel } = require("../models/alarmModel");
 
 // Update alarm
 const updateAlarm = async (req, res) => {
@@ -56,8 +53,6 @@ const updateAlarm = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
-
-const { deleteAlarm: deleteAlarmInModel } = require("../models/alarmModel");
 
 // Delete alarm
 const deleteAlarm = async (req, res) => {

@@ -1,11 +1,11 @@
 const { getDb } = require('../db');
 const collectionName = 'alarms';
 
-// Get all alarms
-const getAlarms = async () => {
+// Get all alarms with optional filter
+const getAlarms = async (filter = {}) => {
     const db = getDb();
     const collection = db.collection(collectionName);
-    const alarms = await collection.find({}).toArray();
+    const alarms = await collection.find(filter).toArray();
     return alarms;
 };
 

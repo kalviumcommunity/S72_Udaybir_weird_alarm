@@ -1,37 +1,83 @@
-const items = []; // Temporary in-memory array
+const { getDb } = require('../db');
+const collectionName = 'users';
 
-// Get all items
-exports.getItems = (req, res) => {
-    res.json(items);
+// Get all users
+const getUsers = async (req, res) => {
+    try {
+        const db = getDb();
+        const collection = db.collection(collectionName);
+        const users = await collection.find({}).toArray();
+        res.status(200).json(users);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 };
 
-// Get a single item by ID
-exports.getItem = (req, res) => {
-    const item = items.find(i => i.id === parseInt(req.params.id));
-    item ? res.json(item) : res.status(404).json({ message: "Item not found" });
+// Get a single user by ID
+const getUserById = async (req, res) => {
+    try {
+        const db = getDb();
+        const collection = db.collection(collectionName);
+        const user = await collection.findOne({ _id: req.params.id });
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 };
 
-// Create a new item
-exports.createItem = (req, res) => {
-    const newItem = { id: items.length + 1, ...req.body };
-    items.push(newItem);
-    res.status(201).json(newItem);
+// Create a new user
+const createUser = async (req, res) => {
+    try {
+        const db = getDb();
+        const collection = db.collection(collectionName);
+        const result = await collection.insertOne(req.body);
+        res.status(201).json(result.ops[0]);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 };
 
-// Update an item by ID
-exports.updateItem = (req, res) => {
-    const index = items.findIndex(i => i.id === parseInt(req.params.id));
-    if (index === -1) return res.status(404).json({ message: "Item not found" });
-
-    items[index] = { ...items[index], ...req.body };
-    res.json(items[index]);
+// Update a user by ID
+const updateUser = async (req, res) => {
+    try {
+        const db = getDb();
+        const collection = db.collection(collectionName);
+        const result = await collection.findOneAndUpdate(
+            { _id: req.params.id },
+            { $set: req.body },
+            { returnDocument: 'after' }
+        );
+        if (!result.value) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.json(result.value);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 };
 
-// Delete an item by ID
-exports.deleteItem = (req, res) => {
-    const index = items.findIndex(i => i.id === parseInt(req.params.id));
-    if (index === -1) return res.status(404).json({ message: "Item not found" });
+// Delete a user by ID
+const deleteUser = async (req, res) => {
+    try {
+        const db = getDb();
+        const collection = db.collection(collectionName);
+        const result = await collection.deleteOne({ _id: req.params.id });
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        res.json({ message: "User deleted" });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
 
-    items.splice(index, 1);
-    res.json({ message: "Item deleted" });
+module.exports = {
+    getUsers,
+    getUserById,
+    createUser,
+    updateUser,
+    deleteUser
 };
