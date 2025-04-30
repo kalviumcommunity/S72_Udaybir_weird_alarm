@@ -1,51 +1,50 @@
 // Import necessary modules
 const express = require('express');
 const cors = require('cors');
-const cookieParser = require('cookie-parser'); // Added cookie-parser
+const cookieParser = require('cookie-parser');
 require('dotenv').config();
 
 const app = express();
 const port = 3000;
 
-// Import MongoDB routes
+// Import routes
 const mongoRoutes = require('../routes/routes');
-
-// Import MySQL routes
 const mysqlRoutes = require('../routes/mysqlRoutes');
+const authRoutes = require('../routes/auth'); // 👈 Auth route
 
+// Middleware
 app.use(cors({
-  origin: 'http://localhost:5173', // Vite default port
-  methods: ['GET', 'POST', 'PUT', 'DELETE']
+  origin: 'http://localhost:5173', // Vite frontend
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true // 👈 Required for cookies
 }));
-
 app.use(express.json());
-app.use(cookieParser()); // Use cookie-parser middleware
+app.use(cookieParser());
 
-// Use MongoDB routes
+// Use routes
 app.use('/api', mongoRoutes);
-
-// Use MySQL routes
 app.use('/mysql-api', mysqlRoutes);
+app.use('/api/auth', authRoutes); // 👈 Auth endpoint
 
-// Basic /ping route with error handling
+// Basic /ping route
 app.get('/ping', (req, res, next) => {
   try {
     res.send('Pong');
   } catch (error) {
-    next(error); // Pass the error to the error-handling middleware
+    next(error);
   }
 });
 
-// Catch-all error handling middleware
+// Catch-all error handler
 app.use((err, req, res, next) => {
-  console.error(err.stack); // Log the error stack for debugging
+  console.error(err.stack);
   res.status(500).json({
     error: 'Something went wrong!',
     message: process.env.NODE_ENV === 'development' ? err.message : 'Internal Server Error',
   });
 });
 
-// Catch-all route for undefined routes
+// 404 handler
 app.use((req, res) => {
   res.status(404).json({
     error: 'Not Found',
@@ -53,7 +52,7 @@ app.use((req, res) => {
   });
 });
 
-// Start the server
+// Start server
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
